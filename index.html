@@ -18,7 +18,7 @@
         including the .gate-photo background on the entry screen.
      3. Navigation is click-through pages (not scroll) — each
         top-nav link shows one .page and hides the rest.
-     4. RSVPs + addresses save to Firebase. Guests authenticate by
+     4. RSVPs save to Firebase. Guests authenticate by
         invited email, and Couple's View requires the admin account.
      ============================================================ */
 
@@ -311,16 +311,36 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     font-family:'Cormorant'; font-style:italic; font-size:clamp(0.82rem,1.1vw,0.98rem); line-height:1.4; color:var(--ink-soft);
     margin:0 auto;
   }
+  .things-mobile-carousels{display:none;}
   #page-things footer{padding:clamp(8px,2vh,16px) 24px; flex:0 0 auto;}
   #page-things footer .f-mono{font-size:1rem; margin-bottom:2px;}
   @media (max-width:760px){
     #page-things.active{overflow:auto;}
-    .things-list{grid-template-columns:1fr 1fr; gap:12px 10px; padding-top:8px; padding-bottom:12px;}
-    .thing-row{border-left:none; border-top:1px solid var(--gold); padding-top:12px;}
-    .thing-row:nth-child(1), .thing-row:nth-child(2), .thing-row:nth-child(6), .thing-row:nth-child(7){border-top:none;}
-    .things-row-label{margin-top:4px;}
+    .things-list{display:none;}
+    .things-mobile-carousels{display:block; flex:1 1 auto; width:100%; padding:10px 20px 22px; overflow:hidden;}
+    .things-carousel + .things-carousel{margin-top:26px;}
+    .things-carousel-heading{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:9px;}
+    .things-carousel-heading h3{font-family:'Cormorant'; font-style:italic; font-weight:500; font-size:1.18rem; color:var(--maroon); margin:0;}
+    .things-carousel-count{font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap;}
+    .things-carousel-window{overflow:hidden;}
+    .things-carousel-track{display:flex; transition:transform .38s ease; touch-action:pan-y;}
+    .things-carousel-slide{flex:0 0 100%; min-width:0; text-align:center; padding:0 2px;}
+    .things-carousel-image-wrap{position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; margin-bottom:12px; background:var(--cream);}
+    .things-carousel-image{width:100%; height:100%; display:block; object-fit:cover;}
+    .things-photo-credit{position:absolute; right:7px; bottom:6px; padding:2px 5px; background:rgba(255,255,255,.78); color:var(--ink-soft); font-size:0.52rem; letter-spacing:.04em;}
+    .things-photo-credit:hover{color:var(--maroon);}
+    .things-carousel-slide h4{font-family:'Cormorant'; font-weight:500; letter-spacing:.06em; text-transform:uppercase; font-size:1.05rem; color:var(--gold); line-height:1.2; margin:0 0 7px;}
+    .things-carousel-slide p{font-family:'Cormorant'; font-style:italic; font-size:.9rem; line-height:1.4; color:var(--ink-soft); margin:0 auto; max-width:330px;}
+    .things-carousel-slide h4 a{color:inherit;}
+    .things-carousel-controls{display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:10px; margin-top:10px;}
+    .things-carousel-arrow{width:38px; height:34px; border:1px solid var(--gold); background:transparent; color:var(--maroon); font-family:'Cormorant'; font-size:1.35rem; line-height:1; cursor:pointer;}
+    .things-carousel-arrow:disabled{opacity:.35; cursor:default;}
+    .things-carousel-dots{display:flex; justify-content:center; align-items:center; gap:7px;}
+    .things-carousel-dot{width:5px; height:5px; border-radius:50%; background:var(--gold); opacity:.3;}
+    .things-carousel-dot.active{opacity:1; transform:scale(1.25);}
     .things-hero h2{font-size:clamp(1.3rem,6vw,1.8rem);}
   }
+  @media (prefers-reduced-motion:reduce){.things-carousel-track{transition:none;}}
 
   /* ============ FAQ ============ */
   #page-faq{background:var(--cream-soft);}
@@ -340,11 +360,23 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     align-content:center;
   }
   .faq-item{border-top:1px solid var(--gold); padding-top:8px;}
-  .faq-item h3{
+  .faq-item h3,
+  .faq-question{
     font-family:'Cormorant'; font-size:clamp(0.98rem,1.5vw,1.16rem); font-weight:600;
     color:var(--maroon); margin:0 0 4px; line-height:1.2;
   }
+  .faq-question{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:0 0 4px; border:0; background:transparent; text-align:left; cursor:pointer;
+  }
+  .faq-question::after{
+    content:'+'; flex:0 0 auto; color:var(--gold); font-family:'Montserrat';
+    font-size:1.15rem; font-weight:400; line-height:1;
+  }
+  .faq-question[aria-expanded="true"]::after{content:'\2212';}
+  .faq-question:focus-visible{outline:2px solid var(--gold); outline-offset:4px;}
   .faq-item p{font-size:clamp(0.7rem,0.95vw,0.82rem); color:var(--ink-soft); line-height:1.45; margin:0;}
+  .faq-item p[hidden]{display:none;}
   #page-faq footer{padding:clamp(6px,1.5vh,14px) 24px; flex:0 0 auto; background:var(--cream); color:var(--ink-soft);}
   #page-faq footer .f-mono{font-size:0.95rem; margin-bottom:2px;}
   @media (max-width:760px){
@@ -545,6 +577,41 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     color:inherit; opacity:0.65;
   }
 
+  /* ---------- mobile navigation and page spacing ---------- */
+  @media (max-width:760px){
+    body{overflow-x:hidden;}
+    .nav{
+      justify-content:flex-start; flex-wrap:nowrap; gap:18px;
+      padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
+      overflow-x:auto; overflow-y:hidden; white-space:nowrap;
+      -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    .nav::-webkit-scrollbar{display:none;}
+    .nav .nav-mono{display:none;}
+    .nav button{flex:0 0 auto;}
+
+    .page{padding-top:calc(52px + env(safe-area-inset-top)); overflow-wrap:break-word;}
+    #page-home.active{padding-top:calc(52px + env(safe-area-inset-top));}
+
+    #page-travel.active,
+    #page-registry.active,
+    #page-rsvp.active{
+      height:auto; min-height:100svh; overflow:visible;
+    }
+    #page-travel .travel-grid{flex:none; align-content:start; padding-top:20px; padding-bottom:24px;}
+    #page-registry .registry-hero{height:auto; min-height:190px;}
+    #page-registry .registry-cards{flex:none; min-height:auto; padding:18px 0 24px;}
+    #page-rsvp .wrap{flex:none; min-height:auto; align-items:flex-start; padding:18px 20px 26px;}
+    #page-rsvp .rsvp-shell{max-height:none; overflow:visible;}
+  }
+
+  @media (max-width:380px){
+    .nav{gap:15px; padding-left:12px; padding-right:12px; font-size:0.64rem;}
+    .travel-grid{column-gap:12px; padding-left:12px; padding-right:12px;}
+    .things-mobile-carousels{padding-left:14px; padding-right:14px;}
+    .faq-grid{padding-left:18px; padding-right:18px;}
+  }
+
   /* ---------- admin modal ---------- */
   .admin-overlay{
     position:fixed; inset:0; background:rgba(63,32,21,0.72); z-index:400;
@@ -606,9 +673,9 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
         <span class="eyebrow">June 4, 2027</span>
         <h3>Welcome Dinner &amp; Rehearsal</h3>
         <div class="ev-lines">
-          <p><a href="https://www.google.com/maps/place/Allied+Arts+Guild/@37.4414075,-122.1814685,17z/data=!3m1!4b1!4m6!3m5!1s0x808fa4cbb61e7ccf:0x6494155886b16c72!8m2!3d37.4414033!4d-122.1788936!16zL20vMDh2NXIw?entry=ttu&amp;g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Allied Arts Guild — The Courtyard</a></p>
-          <p><a href="https://www.google.com/maps/search/?api=1&amp;query=75+Arbor+Rd%2C+Menlo+Park%2C+CA+94025" target="_blank" rel="noopener">75 Arbor Rd, Menlo Park, CA 94025</a></p>
-          <p>6:00 PM in the evening</p>
+          <p><a href="https://www.google.com/maps/search/?api=1&amp;query=Gao+Viet+Kitchen+%26+Bar%2C+313+South+San+Mateo+Drive%2C+San+Mateo%2C+CA+94401" target="_blank" rel="noopener">Gao Viet Kitchen &amp; Bar — San Mateo</a></p>
+          <p>313 South San Mateo Drive, San Mateo, CA 94401</p>
+          <p>7:00 PM to 9:00 PM</p>
           <p>Semi-formal attire</p>
         </div>
         <button class="add-cal" data-cal="welcome">+ Add to Calendar</button>
@@ -631,10 +698,10 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <h3>The Ceremony and Reception</h3>
       <div class="ev-lines">
         <p><a href="https://www.google.com/maps/place/Allied+Arts+Guild/@37.4414075,-122.1814685,17z/data=!3m1!4b1!4m6!3m5!1s0x808fa4cbb61e7ccf:0x6494155886b16c72!8m2!3d37.4414033!4d-122.1788936!16zL20vMDh2NXIw?entry=ttu&amp;g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Allied Arts Guild</a></p>
-        <p><a href="https://www.google.com/maps/search/?api=1&amp;query=75+Arbor+Rd%2C+Menlo+Park%2C+CA+94025" target="_blank" rel="noopener">75 Arbor Rd, Menlo Park, CA 94025</a></p>
+        <p>75 Arbor Rd, Menlo Park, CA 94025</p>
         <p>4:00 PM to 9:00 PM</p>
         <p>Dinner, dancing, and an open bar</p>
-        <p>Formal attire</p>
+        <p>Cocktail attire</p>
       </div>
       <button class="add-cal" data-cal="ceremony">+ Add to Calendar</button>
     </div>
@@ -652,7 +719,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
         <h3>The After Party</h3>
         <div class="ev-lines">
           <p><a href="https://www.google.com/maps/place/Nola/@37.4449386,-122.1614268,16z/data=!3m1!4b1!4m6!3m5!1s0x808fbb398ead0977:0x4ef2a9cf7c0e2ba!8m2!3d37.4449386!4d-122.1614268!16s%2Fm%2F01zkvlv?entry=ttu&amp;g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Nola Palo Alto</a></p>
-          <p><a href="https://www.google.com/maps/search/?api=1&amp;query=535+Ramona+St%2C+Palo+Alto%2C+CA+94301" target="_blank" rel="noopener">535 Ramona St, Palo Alto, CA 94301</a></p>
+          <p>535 Ramona St, Palo Alto, CA 94301</p>
           <p>9:00 PM to midnight</p>
           <p>Late night bites and drinks</p>
         </div>
@@ -680,7 +747,6 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <p>San Francisco Intl. (SFO) or San Jose (SJC)</p>
       <p>~35 min by car</p>
       <p>Rental car or rideshare</p>
-      <a class="travel-btn" href="#" onclick="return false;">Find a Flight</a>
     </div>
     <div class="travel-col">
       <span class="eyebrow">Stay Nearby ($)</span>
@@ -700,14 +766,14 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <span class="eyebrow">Stay Nearby ($$$)</span>
       <h3>El Prado</h3>
       <p>10 min from the venue</p>
-      <p>Free shuttle night-of</p>
       <a class="travel-btn" href="#" onclick="return false;">Book a Room</a>
     </div>
     <div class="travel-col">
-      <span class="eyebrow">Parking &amp; Shuttle</span>
+      <span class="eyebrow">Parking &amp; Transportation</span>
       <h3>Getting To The Venue</h3>
-      <p>Free on-site parking</p>
-      <p>Shuttle every 30 min from 3 PM</p>
+      <p>Free on-site and neighborhood parking</p>
+      <p>Transportation to the After Party departs at 9 PM</p>
+      <p>Cars left on site after the event will need to be collected Monday morning.</p>
     </div>
   </div>
   <footer>
@@ -723,19 +789,19 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     <h2>Things To Do</h2>
   </div>
   <div class="things-list">
-    <div class="thing-row">
+    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/7/7d/Garden_pool_in_Filoli%2C_Woodside%2C_California.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Garden_pool_in_Filoli,_Woodside,_California.jpg" data-photo-credit="Wikimedia Commons">
                   <h4><a href="https://maps.app.goo.gl/Aqo7g9MTCjcofrqT8" target="_blank" rel="noopener">Filoli Historic House &amp; Garden</a></h4>
       <p>A grand estate in nearby Woodside, with sixteen acres of formal gardens — lovely in early June. Tickets required.</p>
     </div>
-    <div class="thing-row">
+    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Stanford_University_Main_Quad_-_7_June_2009.jpg/960px-Stanford_University_Main_Quad_-_7_June_2009.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Stanford_University_Main_Quad_-_7_June_2009.jpg" data-photo-credit="Wikimedia Commons">
             <h4><a href="https://www.google.com/maps/place/The+Stanford+Oval/@37.4319968,-122.1711782,17z/data=!4m15!1m8!3m7!1s0x808fbb2c770584ef:0x598e38cb7c2bf4c9!2sRodin+Sculpture+Garden!8m2!3d37.4322972!4d-122.1708556!10e5!16s%2Fg%2F1tdhf75b!3m5!1s0x808fbb2a2cbff0a9:0x98ffff0995e539ff!8m2!3d37.4301554!4d-122.1693704!16s%2Fg%2F11csq61cjz?entry=ttu&g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Stanford University</a></h4>
       <p>Wander the sandstone quad, then see the famed Rodin sculptures. </p>
     </div>
-    <div class="thing-row">
+    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/7/75/Allied_Arts_Guild_courtyard.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Allied_Arts_Guild_courtyard.jpg" data-photo-credit="Wikimedia Commons">
       <h4><a href="https://www.google.com/maps/place/Allied+Arts+Guild/@37.4414075,-122.1814685,17z/data=!3m1!4b1!4m6!3m5!1s0x808fa4cbb61e7ccf:0x6494155886b16c72!8m2!3d37.4414033!4d-122.1788936!16zL20vMDh2NXIw?entry=ttu&amp;g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Allied Arts Guild</a></h4>
       <p>Our venue is also home to artisan shops and courtyard gardens worth a stroll.</p>
     </div>
-    <div class="thing-row">
+    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Redwood_Grove_Nature_Preserve%2C_Los_Altos%2C_California_13_2018-06-08.jpg/960px-Redwood_Grove_Nature_Preserve%2C_Los_Altos%2C_California_13_2018-06-08.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Redwood_Grove_Nature_Preserve,_Los_Altos,_California_13_2018-06-08.jpg" data-photo-credit="Wikimedia Commons">
             <h4><a href="https://maps.app.goo.gl/JAAinb4ofiTZMDXm6">Los Altos Redwood Grove Nature Preserve</a></h4>
       <p>Stroll through our Thuy's favorite local place and enjoy the shade of the beautiful redwood trees.</p>
     </div>
@@ -757,6 +823,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <p>Fragrant jasmine milk teas and beautifully crafted tea drinks.</p>
     </div>
   </div>
+  <div class="things-mobile-carousels" id="thingsMobileCarousels"></div>
   <footer>
     <div class="f-mono">Thuy &amp; Kevin</div>
     <button class="f-link" id="adminToggle4">Couple's View</button>
@@ -930,11 +997,6 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
         <span id="firebaseHouseholdName"></span>
         <button type="button" class="firebase-signout" id="firebaseSignout">Sign Out</button>
       </div>
-      <div class="rsvp-toggle-row">
-        <button class="active" data-panel="rsvpPanel" id="tabRsvp">RSVP</button>
-        <button data-panel="addrPanel" id="tabAddr">Mailing Address</button>
-      </div>
-
       <div class="panel active" id="rsvpPanel">
         <form id="rsvpForm">
           <p class="rsvp-intro">Please respond for each named guest and each event shown below.</p>
@@ -948,33 +1010,10 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
         </form>
       </div>
 
-      <div class="panel" id="addrPanel">
-        <form id="addrForm">
-          <div class="form-row">
-            <label>Full Name</label>
-            <input type="text" id="addrName" placeholder="Jane Doe" required>
-          </div>
-          <div class="form-row">
-            <label>Street Address</label>
-            <input type="text" id="addrStreet" placeholder="123 Main St, Apt 4B" required>
-          </div>
-          <div class="form-cols">
-            <div class="form-row"><label>City</label><input type="text" id="addrCity" required></div>
-            <div class="form-row"><label>State / Province</label><input type="text" id="addrState" required></div>
-          </div>
-          <div class="form-cols">
-            <div class="form-row"><label>ZIP / Postal Code</label><input type="text" id="addrZip" required></div>
-            <div class="form-row"><label>Country</label><input type="text" id="addrCountry" value="United States" required></div>
-          </div>
-          <button type="submit" class="submit-btn">Save Address</button>
-          <div class="form-msg" id="addrMsg"></div>
-        </form>
-      </div>
     </div>
   </div>
   <footer>
     <div class="f-mono">Thuy &amp; Kevin</div>
-    <div>Questions? <a href="mailto:hello@laurenandkevin.wedding" style="text-decoration:underline;">hello@laurenandkevin.wedding</a></div>
     <button class="f-link" id="adminToggle6">Couple's View</button>
   </footer>
 </section>
@@ -998,13 +1037,10 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <div class="admin-summary" id="adminSummary"></div>
       <div class="admin-actions">
         <button id="exportRsvpCsv">Export RSVPs (CSV)</button>
-        <button id="exportAddrCsv">Export Addresses (CSV)</button>
         <button id="refreshAdmin">Refresh</button>
       </div>
       <h3 style="font-size:1.15rem; margin-bottom:12px; color:var(--maroon);">RSVPs</h3>
       <table class="admin-table" id="rsvpTable"><thead><tr><th>Household</th><th>Guest</th><th>Tea Ceremony</th><th>Welcome Event</th><th>Ceremony &amp; Reception</th><th>After Party</th><th>Dietary</th><th>Note</th></tr></thead><tbody></tbody></table>
-      <h3 style="font-size:1.15rem; margin-bottom:12px; color:var(--maroon);">Mailing Addresses</h3>
-      <table class="admin-table" id="addrTable"><thead><tr><th>Name</th><th>Address</th></tr></thead><tbody></tbody></table>
     </div>
   </div>
 </div>
@@ -1015,7 +1051,7 @@ const CONFIG = {
   names: { partner1: "Lauren", partner2: "Kevin" },
   weddingDateISO: "2027-06-05T16:00:00",
   location: "Menlo Park, California",
-  welcome:  { title: "Welcome Dinner & Rehearsal", start: "2027-06-04T18:00:00", end: "2027-06-04T21:00:00", location: "Allied Arts Guild — The Courtyard, Menlo Park, CA" },
+  welcome:  { title: "Welcome Dinner & Rehearsal", start: "2027-06-04T19:00:00", end: "2027-06-04T21:00:00", location: "Gao Viet Kitchen & Bar, 313 South San Mateo Drive, San Mateo, CA 94401" },
   ceremony: { title: "Lauren & Kevin's Ceremony",  start: "2027-06-05T16:00:00", end: "2027-06-05T17:00:00", location: "Allied Arts Guild — The Gardens, Menlo Park, CA" },
   reception:{ title: "Lauren & Kevin's Reception", start: "2027-06-05T18:00:00", end: "2027-06-06T00:00:00", location: "Allied Arts Guild — Main Hall, Menlo Park, CA" }
 };
@@ -1027,11 +1063,159 @@ function goToPage(name){
   pages.forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
   navButtons.forEach(b => b.classList.toggle('active', b.dataset.page === name));
   window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+  const activeNavButton = document.querySelector(`.nav button[data-page="${name}"]`);
+  if(activeNavButton && window.matchMedia('(max-width:760px)').matches){
+    activeNavButton.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }
   if(name === 'gallery') resetGallery();
 }
 document.querySelectorAll('[data-page]').forEach(el=>{
   el.addEventListener('click', () => goToPage(el.dataset.page));
 });
+
+/* ================= FAQ accordion ================= */
+document.querySelectorAll('.faq-item').forEach((item, index) => {
+  const heading = item.querySelector('h3');
+  const answer = item.querySelector('p');
+  if(!heading || !answer) return;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'faq-question';
+  button.id = `faq-question-${index}`;
+  button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-controls', `faq-answer-${index}`);
+  button.innerHTML = heading.innerHTML;
+
+  answer.id = `faq-answer-${index}`;
+  answer.setAttribute('aria-labelledby', button.id);
+  answer.hidden = true;
+  heading.replaceWith(button);
+
+  button.addEventListener('click', () => {
+    const isOpen = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!isOpen));
+    answer.hidden = isOpen;
+  });
+});
+
+/* ================= mobile Things to Do carousels ================= */
+const thingsMobileCarousels = document.getElementById('thingsMobileCarousels');
+if(thingsMobileCarousels){
+  const allThingRows = Array.from(document.querySelectorAll('#page-things .things-list .thing-row'));
+  const carouselGroups = [
+    { title:'Places to Explore', rows:allThingRows.slice(0,4), showImages:true },
+    { title:'Our Favorite Eateries', rows:allThingRows.slice(4), showImages:false }
+  ];
+
+  carouselGroups.forEach((group, groupIndex) => {
+    const section = document.createElement('section');
+    section.className = 'things-carousel';
+    section.setAttribute('aria-label', group.title);
+
+    const heading = document.createElement('div');
+    heading.className = 'things-carousel-heading';
+    const title = document.createElement('h3');
+    title.textContent = group.title;
+    const count = document.createElement('span');
+    count.className = 'things-carousel-count';
+    heading.append(title, count);
+
+    const windowEl = document.createElement('div');
+    windowEl.className = 'things-carousel-window';
+    const track = document.createElement('div');
+    track.className = 'things-carousel-track';
+
+    group.rows.forEach(row => {
+      const slide = document.createElement('article');
+      slide.className = 'things-carousel-slide';
+
+      if(group.showImages && row.dataset.highlightImage){
+        const figure = document.createElement('figure');
+        figure.className = 'things-carousel-image-wrap';
+        const image = document.createElement('img');
+        image.className = 'things-carousel-image';
+        image.src = row.dataset.highlightImage;
+        image.alt = `${row.querySelector('h4').textContent.trim()} highlight`;
+        image.loading = groupIndex === 0 && track.children.length === 0 ? 'eager' : 'lazy';
+        figure.appendChild(image);
+
+        if(row.dataset.photoSource){
+          const credit = document.createElement('a');
+          credit.className = 'things-photo-credit';
+          credit.href = row.dataset.photoSource;
+          credit.target = '_blank';
+          credit.rel = 'noopener';
+          credit.textContent = `Photo: ${row.dataset.photoCredit || 'source'}`;
+          figure.appendChild(credit);
+        }
+        slide.appendChild(figure);
+      }
+
+      const rowHeading = row.querySelector('h4');
+      const rowDescription = row.querySelector('p');
+      if(rowHeading) slide.appendChild(rowHeading.cloneNode(true));
+      if(rowDescription) slide.appendChild(rowDescription.cloneNode(true));
+      track.appendChild(slide);
+    });
+
+    windowEl.appendChild(track);
+
+    const controls = document.createElement('div');
+    controls.className = 'things-carousel-controls';
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.className = 'things-carousel-arrow';
+    previous.setAttribute('aria-label', `Previous ${group.title.toLowerCase()} recommendation`);
+    previous.innerHTML = '&#8249;';
+    const dots = document.createElement('div');
+    dots.className = 'things-carousel-dots';
+    dots.setAttribute('aria-hidden', 'true');
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.className = 'things-carousel-arrow';
+    next.setAttribute('aria-label', `Next ${group.title.toLowerCase()} recommendation`);
+    next.innerHTML = '&#8250;';
+    controls.append(previous, dots, next);
+
+    let currentIndex = 0;
+    let swipeStartX = null;
+    function updateThingsCarousel(){
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      count.textContent = `${currentIndex + 1} of ${group.rows.length}`;
+      previous.disabled = currentIndex === 0;
+      next.disabled = currentIndex === group.rows.length - 1;
+      dots.innerHTML = '';
+      group.rows.forEach((_, dotIndex) => {
+        const dot = document.createElement('span');
+        dot.className = `things-carousel-dot${dotIndex === currentIndex ? ' active' : ''}`;
+        dots.appendChild(dot);
+      });
+    }
+    previous.addEventListener('click', () => {
+      if(currentIndex > 0){ currentIndex--; updateThingsCarousel(); }
+    });
+    next.addEventListener('click', () => {
+      if(currentIndex < group.rows.length - 1){ currentIndex++; updateThingsCarousel(); }
+    });
+    track.addEventListener('pointerdown', event => { swipeStartX = event.clientX; });
+    track.addEventListener('pointerup', event => {
+      if(swipeStartX === null) return;
+      const distance = event.clientX - swipeStartX;
+      if(Math.abs(distance) > 45){
+        if(distance < 0 && currentIndex < group.rows.length - 1) currentIndex++;
+        if(distance > 0 && currentIndex > 0) currentIndex--;
+        updateThingsCarousel();
+      }
+      swipeStartX = null;
+    });
+    track.addEventListener('pointercancel', () => { swipeStartX = null; });
+
+    section.append(heading, windowEl, controls);
+    thingsMobileCarousels.appendChild(section);
+    updateThingsCarousel();
+  });
+}
 
 /* ================= gallery (horizontal, click-through) ================= */
 const gallerySlides = document.querySelectorAll('.gallery-slide');
@@ -1072,28 +1256,24 @@ renderCountdown();
 setInterval(renderCountdown, 1000);
 
 /* ================= add to calendar (.ics) ================= */
-function toICSDate(iso){ return iso.replace(/[-:]/g,'').split('.')[0] + 'Z'; }
+function toICSLocal(iso){ return iso.replace(/[-:]/g,'').split('.')[0]; }
+function toICSUtc(date){ return date.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z'; }
+function escapeICS(value){ return String(value).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
 function downloadICS(kind){
   const ev = CONFIG[kind];
-  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',
-    `SUMMARY:${ev.title}`, `DTSTART:${toICSDate(ev.start)}`, `DTEND:${toICSDate(ev.end)}`,
-    `LOCATION:${ev.location}`, 'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lauren and Kevin Wedding//EN','CALSCALE:GREGORIAN',
+    'BEGIN:VTIMEZONE','TZID:America/Los_Angeles','X-LIC-LOCATION:America/Los_Angeles',
+    'BEGIN:DAYLIGHT','TZOFFSETFROM:-0800','TZOFFSETTO:-0700','TZNAME:PDT','DTSTART:19700308T020000','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU','END:DAYLIGHT',
+    'BEGIN:STANDARD','TZOFFSETFROM:-0700','TZOFFSETTO:-0800','TZNAME:PST','DTSTART:19701101T020000','RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU','END:STANDARD','END:VTIMEZONE',
+    'BEGIN:VEVENT',`UID:${kind}-2027@laurenandkevin.wedding`,`DTSTAMP:${toICSUtc(new Date())}`,
+    `SUMMARY:${escapeICS(ev.title)}`, `DTSTART;TZID=America/Los_Angeles:${toICSLocal(ev.start)}`, `DTEND;TZID=America/Los_Angeles:${toICSLocal(ev.end)}`,
+    `LOCATION:${escapeICS(ev.location)}`, 'END:VEVENT','END:VCALENDAR'].join('\r\n');
   const blob = new Blob([ics], {type:'text/calendar'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = `${kind}.ics`; a.click();
   URL.revokeObjectURL(url);
 }
 document.querySelectorAll('.add-cal').forEach(btn=> btn.addEventListener('click', () => downloadICS(btn.dataset.cal)));
-
-/* ================= RSVP tabs ================= */
-document.getElementById('tabRsvp').addEventListener('click', () => switchTab('rsvpPanel','tabRsvp'));
-document.getElementById('tabAddr').addEventListener('click', () => switchTab('addrPanel','tabAddr'));
-function switchTab(panelId, tabId){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.rsvp-toggle-row button').forEach(b=>b.classList.remove('active'));
-  document.getElementById(panelId).classList.add('active');
-  document.getElementById(tabId).classList.add('active');
-}
 
 const RSVP_EVENTS = {
   teaCeremony:'Tea Ceremony',
@@ -1164,29 +1344,6 @@ document.getElementById('rsvpForm').addEventListener('submit', async (e) => {
   } else { msg.textContent = "Something went wrong — please try again."; msg.className = 'form-msg err'; }
 });
 
-/* ================= Address submit ================= */
-document.getElementById('addrForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const msg = document.getElementById('addrMsg');
-  const submitBtn = e.target.querySelector('.submit-btn');
-  submitBtn.disabled = true;
-  const entry = {
-    name: document.getElementById('addrName').value.trim(),
-    street: document.getElementById('addrStreet').value.trim(),
-    city: document.getElementById('addrCity').value.trim(),
-    state: document.getElementById('addrState').value.trim(),
-    zip: document.getElementById('addrZip').value.trim(),
-    country: document.getElementById('addrCountry').value.trim(),
-    submittedAt: new Date().toISOString()
-  };
-  const ok = await window.firebaseWedding.saveAddress(entry);
-  submitBtn.disabled = false;
-  if(ok){
-    msg.textContent = "Thank you — we've saved your address!"; msg.className = 'form-msg ok';
-    e.target.querySelector('.submit-btn').textContent = 'Update Address';
-  } else { msg.textContent = "Something went wrong — please try again."; msg.className = 'form-msg err'; }
-});
-
 /* ================= Admin / couple's view (modal) ================= */
 const adminOverlay = document.getElementById('adminOverlay');
 function openAdmin(){
@@ -1202,12 +1359,10 @@ adminOverlay.addEventListener('click', (e) => { if(e.target === adminOverlay) ad
 document.getElementById('refreshAdmin').addEventListener('click', loadAdminData);
 
 let cachedRsvps = [];
-let cachedAddrs = [];
 let cachedGuestRsvps = [];
 async function loadAdminData(){
   const data = await window.firebaseWedding.getAdminData();
   cachedRsvps = data.rsvps;
-  cachedAddrs = data.addresses;
   cachedGuestRsvps = cachedRsvps.flatMap(r=>{
     const guests = Array.isArray(r.guests) && r.guests.length ? r.guests : [{name:r.name || r.householdName || 'Guest',dietary:r.dietary || '',events:{ceremonyReception:r.attending || ''}}];
     return guests.map(g=>({
@@ -1232,10 +1387,6 @@ async function loadAdminData(){
     .map(r => `<tr><td>${escapeHtml(r.household)}</td><td>${escapeHtml(r.guest)}</td><td>${responseLabel(r.teaCeremony)}</td><td>${responseLabel(r.welcomeEvent)}</td><td>${responseLabel(r.ceremonyReception)}</td><td>${responseLabel(r.afterParty)}</td><td>${escapeHtml(r.dietary)}</td><td>${escapeHtml(r.note)}</td></tr>`)
     .join('') || '<tr><td colspan="8" style="opacity:0.5;">No RSVPs yet.</td></tr>';
 
-  document.querySelector('#addrTable tbody').innerHTML = cachedAddrs
-    .sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt))
-    .map(a => `<tr><td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.street)}, ${escapeHtml(a.city)}, ${escapeHtml(a.state)} ${escapeHtml(a.zip)}, ${escapeHtml(a.country)}</td></tr>`)
-    .join('') || '<tr><td colspan="2" style="opacity:0.5;">No addresses yet.</td></tr>';
 }
 function escapeHtml(str){
   return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -1251,7 +1402,6 @@ function downloadCsv(filename, content){
   URL.revokeObjectURL(url);
 }
 document.getElementById('exportRsvpCsv').addEventListener('click', () => downloadCsv('rsvps-by-guest.csv', toCsv(cachedGuestRsvps, ['household','guest','teaCeremony','welcomeEvent','ceremonyReception','afterParty','dietary','note','submittedAt'])));
-document.getElementById('exportAddrCsv').addEventListener('click', () => downloadCsv('addresses.csv', toCsv(cachedAddrs, ['name','street','city','state','zip','country','submittedAt'])));
 </script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js';
@@ -1324,10 +1474,7 @@ function normalizeInvitedGuests(invite){
 
 async function loadHouseholdForms(){
   const householdId = activeInvite.householdId;
-  const [rsvpSnap,addressSnap] = await Promise.all([
-    getDoc(doc(db,'rsvps',householdId)),
-    getDoc(doc(db,'addresses',householdId))
-  ]);
+  const rsvpSnap = await getDoc(doc(db,'rsvps',householdId));
   const invitedGuests = normalizeInvitedGuests(activeInvite);
   if(rsvpSnap.exists()){
     const r = rsvpSnap.data();
@@ -1337,13 +1484,6 @@ async function loadHouseholdForms(){
     $('rsvpForm').querySelector('.submit-btn').textContent = 'Update RSVP';
   } else {
     window.renderGuestRsvpForm(invitedGuests,[]);
-  }
-  if(addressSnap.exists()){
-    const a = addressSnap.data();
-    ['Name','Street','City','State','Zip','Country'].forEach(k=>fillValue(`addr${k}`,a[k.toLowerCase()]));
-    $('addrForm').querySelector('.submit-btn').textContent = 'Update Address';
-  } else {
-    fillValue('addrName',activeInvite.householdName || '');
   }
 }
 
@@ -1415,11 +1555,8 @@ async function saveHouseholdDocument(collectionName,entry){
 
 async function getAdminData(){
   if(!auth.currentUser || auth.currentUser.uid !== ADMIN_UID) throw new Error('Admin authentication required.');
-  const [rsvpSnap,addressSnap] = await Promise.all([getDocs(collection(db,'rsvps')),getDocs(collection(db,'addresses'))]);
-  return {
-    rsvps:rsvpSnap.docs.map(d=>({id:d.id,...d.data()})),
-    addresses:addressSnap.docs.map(d=>({id:d.id,...d.data()}))
-  };
+  const rsvpSnap = await getDocs(collection(db,'rsvps'));
+  return {rsvps:rsvpSnap.docs.map(d=>({id:d.id,...d.data()}))};
 }
 
 function showAdminState(){
@@ -1444,7 +1581,6 @@ $('adminLoginButton').addEventListener('click', async () => {
 
 window.firebaseWedding = {
   saveRsvp:entry=>saveHouseholdDocument('rsvps',entry),
-  saveAddress:entry=>saveHouseholdDocument('addresses',entry),
   getAdminData,
   showAdminState
 };
