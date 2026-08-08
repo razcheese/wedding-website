@@ -581,17 +581,17 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   @media (max-width:760px){
     body{overflow-x:hidden;}
     .nav{
-      justify-content:flex-start; flex-wrap:nowrap; gap:18px;
-      padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
-      overflow-x:auto; overflow-y:hidden; white-space:nowrap;
-      -webkit-overflow-scrolling:touch; scrollbar-width:none;
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:5px 8px;
+      padding:calc(8px + env(safe-area-inset-top)) 10px 8px;
+      overflow:visible; white-space:normal;
+      font-size:clamp(0.55rem,2.4vw,0.66rem); letter-spacing:0.08em;
     }
-    .nav::-webkit-scrollbar{display:none;}
     .nav .nav-mono{display:none;}
-    .nav button{flex:0 0 auto;}
+    .nav button{width:100%; min-width:0; padding:5px 0; white-space:nowrap;}
 
-    .page{padding-top:calc(52px + env(safe-area-inset-top)); overflow-wrap:break-word;}
-    #page-home.active{padding-top:calc(52px + env(safe-area-inset-top));}
+    .page{padding-top:calc(76px + env(safe-area-inset-top)); overflow-wrap:break-word;}
+    #page-home.active{padding-top:calc(76px + env(safe-area-inset-top));}
 
     #page-travel.active,
     #page-registry.active,
@@ -606,7 +606,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   }
 
   @media (max-width:380px){
-    .nav{gap:15px; padding-left:12px; padding-right:12px; font-size:0.64rem;}
+    .nav{column-gap:4px; padding-left:7px; padding-right:7px; font-size:0.55rem; letter-spacing:0.06em;}
     .travel-grid{column-gap:12px; padding-left:12px; padding-right:12px;}
     .things-mobile-carousels{padding-left:14px; padding-right:14px;}
     .faq-grid{padding-left:18px; padding-right:18px;}
@@ -723,7 +723,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
           <p>9:00 PM to midnight</p>
           <p>Late night bites and drinks</p>
         </div>
-        <button class="add-cal" data-cal="reception">+ Add to Calendar</button>
+        <button class="add-cal" data-cal="afterParty">+ Add to Calendar</button>
       </div>
     </div>
   </div>
@@ -790,7 +790,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   </div>
   <div class="things-list">
     <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/7/7d/Garden_pool_in_Filoli%2C_Woodside%2C_California.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Garden_pool_in_Filoli,_Woodside,_California.jpg" data-photo-credit="Wikimedia Commons">
-                  <h4><a href="https://maps.app.goo.gl/Aqo7g9MTCjcofrqT8" target="_blank" rel="noopener">Filoli Historic House &amp; Garden</a></h4>
+                  <h4><a href="https://www.google.com/maps/search/?api=1&amp;query=Filoli%2C+86+Ca%C3%B1ada+Road%2C+Woodside%2C+CA+94062" target="_blank" rel="noopener">Filoli Historic House &amp; Garden</a></h4>
       <p>A grand estate in nearby Woodside, with sixteen acres of formal gardens — lovely in early June. Tickets required.</p>
     </div>
     <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Stanford_University_Main_Quad_-_7_June_2009.jpg/960px-Stanford_University_Main_Quad_-_7_June_2009.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Stanford_University_Main_Quad_-_7_June_2009.jpg" data-photo-credit="Wikimedia Commons">
@@ -802,7 +802,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <p>Our venue is also home to artisan shops and courtyard gardens worth a stroll.</p>
     </div>
     <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Redwood_Grove_Nature_Preserve%2C_Los_Altos%2C_California_13_2018-06-08.jpg/960px-Redwood_Grove_Nature_Preserve%2C_Los_Altos%2C_California_13_2018-06-08.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Redwood_Grove_Nature_Preserve,_Los_Altos,_California_13_2018-06-08.jpg" data-photo-credit="Wikimedia Commons">
-            <h4><a href="https://maps.app.goo.gl/JAAinb4ofiTZMDXm6">Los Altos Redwood Grove Nature Preserve</a></h4>
+            <h4><a href="https://www.google.com/maps/search/?api=1&amp;query=Redwood+Grove+Nature+Preserve%2C+482+University+Avenue%2C+Los+Altos%2C+CA+94022" target="_blank" rel="noopener">Los Altos Redwood Grove Nature Preserve</a></h4>
       <p>Stroll through our Thuy's favorite local place and enjoy the shade of the beautiful redwood trees.</p>
     </div>
     <h3 class="things-row-label">Our Favorite Eateries</h3>
@@ -1051,9 +1051,9 @@ const CONFIG = {
   names: { partner1: "Lauren", partner2: "Kevin" },
   weddingDateISO: "2027-06-05T16:00:00",
   location: "Menlo Park, California",
-  welcome:  { title: "Welcome Dinner & Rehearsal", start: "2027-06-04T19:00:00", end: "2027-06-04T21:00:00", location: "Gao Viet Kitchen & Bar, 313 South San Mateo Drive, San Mateo, CA 94401" },
-  ceremony: { title: "Lauren & Kevin's Ceremony",  start: "2027-06-05T16:00:00", end: "2027-06-05T17:00:00", location: "Allied Arts Guild — The Gardens, Menlo Park, CA" },
-  reception:{ title: "Lauren & Kevin's Reception", start: "2027-06-05T18:00:00", end: "2027-06-06T00:00:00", location: "Allied Arts Guild — Main Hall, Menlo Park, CA" }
+  welcome: { title: "Thuy & Kevin's Welcome Dinner & Rehearsal", start: "2027-06-04T19:00:00", end: "2027-06-04T21:00:00", location: "Gao Viet Kitchen & Bar, 313 South San Mateo Drive, San Mateo, CA 94401" },
+  ceremony: { title: "Thuy & Kevin's Ceremony & Reception", start: "2027-06-05T16:00:00", end: "2027-06-05T21:00:00", location: "Allied Arts Guild, 75 Arbor Road, Menlo Park, CA 94025" },
+  afterParty: { title: "Thuy & Kevin's After Party", start: "2027-06-05T21:00:00", end: "2027-06-06T00:00:00", location: "Nola Palo Alto, 535 Ramona Street, Palo Alto, CA 94301" }
 };
 
 /* ================= page navigation (click-through, not scroll) ================= */
@@ -1063,10 +1063,6 @@ function goToPage(name){
   pages.forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
   navButtons.forEach(b => b.classList.toggle('active', b.dataset.page === name));
   window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
-  const activeNavButton = document.querySelector(`.nav button[data-page="${name}"]`);
-  if(activeNavButton && window.matchMedia('(max-width:760px)').matches){
-    activeNavButton.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
-  }
   if(name === 'gallery') resetGallery();
 }
 document.querySelectorAll('[data-page]').forEach(el=>{
@@ -1261,11 +1257,11 @@ function toICSUtc(date){ return date.toISOString().replace(/[-:]/g,'').split('.'
 function escapeICS(value){ return String(value).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
 function downloadICS(kind){
   const ev = CONFIG[kind];
-  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Lauren and Kevin Wedding//EN','CALSCALE:GREGORIAN',
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Thuy and Kevin Wedding//EN','CALSCALE:GREGORIAN',
     'BEGIN:VTIMEZONE','TZID:America/Los_Angeles','X-LIC-LOCATION:America/Los_Angeles',
     'BEGIN:DAYLIGHT','TZOFFSETFROM:-0800','TZOFFSETTO:-0700','TZNAME:PDT','DTSTART:19700308T020000','RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU','END:DAYLIGHT',
     'BEGIN:STANDARD','TZOFFSETFROM:-0700','TZOFFSETTO:-0800','TZNAME:PST','DTSTART:19701101T020000','RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU','END:STANDARD','END:VTIMEZONE',
-    'BEGIN:VEVENT',`UID:${kind}-2027@laurenandkevin.wedding`,`DTSTAMP:${toICSUtc(new Date())}`,
+    'BEGIN:VEVENT',`UID:${kind}-2027@thuyandkevin.wedding`,`DTSTAMP:${toICSUtc(new Date())}`,
     `SUMMARY:${escapeICS(ev.title)}`, `DTSTART;TZID=America/Los_Angeles:${toICSLocal(ev.start)}`, `DTEND;TZID=America/Los_Angeles:${toICSLocal(ev.end)}`,
     `LOCATION:${escapeICS(ev.location)}`, 'END:VEVENT','END:VCALENDAR'].join('\r\n');
   const blob = new Blob([ics], {type:'text/calendar'});
