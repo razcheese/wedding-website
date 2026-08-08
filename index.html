@@ -669,6 +669,17 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   .admin-summary .a-stat span{font-size:0.66rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft);}
   .admin-actions{display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;}
   .admin-actions button{padding:10px 18px; border:1px solid var(--maroon); background:transparent; cursor:pointer; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--maroon);}
+  .admin-actions button:disabled{opacity:0.4; cursor:not-allowed;}
+  .admin-import{margin:8px 0 32px; padding:20px; border:1px solid var(--line); background:rgba(255,255,255,0.34);}
+  .admin-import h3{font-size:1.15rem; margin-bottom:7px; color:var(--maroon);}
+  .admin-import p{font-size:0.76rem; line-height:1.55; color:var(--ink-soft); margin:0 0 14px;}
+  .admin-file-label{display:inline-block; padding:10px 18px; border:1px solid var(--maroon); cursor:pointer; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--maroon);}
+  .admin-file-label input{position:absolute; width:1px; height:1px; opacity:0; pointer-events:none;}
+  .import-preview{display:none; margin-top:18px; overflow-x:auto;}
+  .import-preview.active{display:block;}
+  .import-preview-summary{font-size:0.76rem; color:var(--ink); margin-bottom:9px;}
+  .import-preview table{min-width:680px; margin-bottom:14px;}
+  .import-errors{margin:12px 0 0; padding-left:18px; color:#a8534a; font-size:0.74rem; line-height:1.5;}
   .admin-table{width:100%; border-collapse:collapse; font-size:0.84rem; margin-bottom:34px;}
   .admin-table th, .admin-table td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top;}
   .admin-table th{font-size:0.64rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft);}
@@ -1082,6 +1093,21 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
       <div class="admin-actions">
         <button id="exportRsvpCsv">Export RSVPs (CSV)</button>
         <button id="refreshAdmin">Refresh</button>
+      </div>
+      <div class="admin-import">
+        <h3>Guest List Import</h3>
+        <p>Use the CSV template to add named guests, authorized household emails, and event invitations. Importing updates invitation records only and does not delete existing RSVPs.</p>
+        <div class="admin-actions" style="margin-bottom:0;">
+          <button type="button" id="downloadGuestTemplate">Download CSV Template</button>
+          <label class="admin-file-label">Choose CSV<input type="file" id="guestCsvFile" accept=".csv,text/csv"></label>
+        </div>
+        <div class="form-msg" id="guestImportMsg"></div>
+        <div class="import-preview" id="guestImportPreview">
+          <div class="import-preview-summary" id="guestImportSummary"></div>
+          <table class="admin-table"><thead><tr><th>Household</th><th>Emails</th><th>Guests</th><th>Invitations</th></tr></thead><tbody id="guestImportRows"></tbody></table>
+          <button type="button" class="submit-btn" id="uploadGuestCsv" disabled>Upload Invitations to Firebase</button>
+          <ul class="import-errors" id="guestImportErrors"></ul>
+        </div>
       </div>
       <h3 style="font-size:1.15rem; margin-bottom:12px; color:var(--maroon);">RSVPs</h3>
       <table class="admin-table" id="rsvpTable"><thead><tr><th>Household</th><th>Guest</th><th>Tea Ceremony</th><th>Welcome Event</th><th>Ceremony &amp; Reception</th><th>After Party</th><th>Dietary</th><th>Note</th></tr></thead><tbody></tbody></table>
@@ -1596,7 +1622,7 @@ import {
   signInWithEmailLink, signInWithEmailAndPassword, signOut
 } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js';
 import {
-  getFirestore, doc, getDoc, getDocs, collection, setDoc, serverTimestamp
+  getFirestore, doc, getDoc, getDocs, collection, setDoc, serverTimestamp, writeBatch
 } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -1763,6 +1789,143 @@ $('adminLoginButton').addEventListener('click', async () => {
     showAdminState();
   } catch(error){ msg.textContent = error.message.includes('authorized') ? error.message : 'Unable to sign in. Please check the email and password.'; msg.className='form-msg err'; }
   finally { $('adminLoginButton').disabled = false; }
+});
+
+/* ================= private guest-list CSV importer ================= */
+const CSV_HEADERS = ['householdId','householdName','emails','guestName','teaCeremony','welcomeEvent','ceremonyReception','afterParty'];
+const CSV_EVENT_COLUMNS = [
+  ['teaCeremony','Tea Ceremony'],['welcomeEvent','Welcome Event'],
+  ['ceremonyReception','Ceremony & Reception'],['afterParty','After Party']
+];
+let pendingGuestImport = [];
+
+function parseCsv(text){
+  const rows=[]; let row=[]; let field=''; let quoted=false;
+  const source=String(text || '').replace(/^\uFEFF/,'');
+  for(let i=0;i<source.length;i++){
+    const char=source[i];
+    if(quoted){
+      if(char==='"' && source[i+1]==='"'){ field+='"'; i++; }
+      else if(char==='"') quoted=false;
+      else field+=char;
+    } else if(char==='"') quoted=true;
+    else if(char===','){ row.push(field); field=''; }
+    else if(char==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+    else if(char!=='\r') field+=char;
+  }
+  if(quoted) throw new Error('The CSV contains an unclosed quotation mark.');
+  if(field || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(values=>values.some(value=>String(value).trim()));
+}
+
+function normalizedHeader(value){ return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]/g,''); }
+function csvIsYes(value){ return ['yes','y','true','1','x'].includes(String(value || '').trim().toLowerCase()); }
+function csvEventValueIsValid(value){ return ['', 'yes','y','true','1','x','no','n','false','0'].includes(String(value || '').trim().toLowerCase()); }
+function validEmail(value){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
+function adminEscape(value){
+  return String(value ?? '').replace(/[&<>"']/g, char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+function setImportMessage(message,isError=false){
+  const element=$('guestImportMsg'); element.textContent=message;
+  element.className=`form-msg ${isError ? 'err' : message ? 'ok' : ''}`;
+}
+function downloadGuestTemplate(){
+  const sample=[
+    CSV_HEADERS.join(','),
+    'ben-jerry,Ben & Jerry,ben@example.com; jerry@example.com,Ben,Yes,Yes,Yes,Yes',
+    'ben-jerry,Ben & Jerry,ben@example.com; jerry@example.com,Jerry,No,Yes,Yes,Yes'
+  ].join('\r\n');
+  const blob=new Blob([sample],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob); const link=document.createElement('a');
+  link.href=url; link.download='wedding-guest-list-template.csv'; link.click(); URL.revokeObjectURL(url);
+}
+
+function buildGuestImport(text){
+  const rows=parseCsv(text);
+  if(rows.length<2) throw new Error('The CSV does not contain any guest rows.');
+  const headerIndexes=new Map(rows[0].map((header,index)=>[normalizedHeader(header),index]));
+  const missing=CSV_HEADERS.filter(header=>!headerIndexes.has(normalizedHeader(header)));
+  if(missing.length) throw new Error(`Missing columns: ${missing.join(', ')}`);
+  const households=new Map(); const emailHouseholds=new Map(); const errors=[];
+  rows.slice(1).forEach((values,rowOffset)=>{
+    const rowNumber=rowOffset+2;
+    const get=header=>String(values[headerIndexes.get(normalizedHeader(header))] || '').trim();
+    const householdId=get('householdId'); const householdName=get('householdName'); const guestName=get('guestName');
+    const emails=[...new Set(get('emails').split(';').map(normalizedEmail).filter(Boolean))];
+    if(!householdId) errors.push(`Row ${rowNumber}: householdId is required.`);
+    else if(householdId.includes('/')) errors.push(`Row ${rowNumber}: householdId cannot contain a slash.`);
+    if(!householdName) errors.push(`Row ${rowNumber}: householdName is required.`);
+    if(!guestName) errors.push(`Row ${rowNumber}: guestName is required.`);
+    if(!emails.length) errors.push(`Row ${rowNumber}: at least one email is required.`);
+    emails.filter(email=>!validEmail(email)).forEach(email=>errors.push(`Row ${rowNumber}: “${email}” is not a valid email.`));
+    CSV_EVENT_COLUMNS.forEach(([column])=>{ if(!csvEventValueIsValid(get(column))) errors.push(`Row ${rowNumber}: ${column} must be Yes or No.`); });
+    if(!householdId || !householdName || !guestName || !emails.length) return;
+    let household=households.get(householdId);
+    if(!household){ household={householdId,householdName,emails:new Set(),guests:new Map()}; households.set(householdId,household); }
+    if(household.householdName!==householdName) errors.push(`Row ${rowNumber}: household ${householdId} has two different names.`);
+    emails.forEach(email=>{
+      household.emails.add(email);
+      if(emailHouseholds.has(email) && emailHouseholds.get(email)!==householdId) errors.push(`Row ${rowNumber}: ${email} is assigned to more than one household.`);
+      else emailHouseholds.set(email,householdId);
+    });
+    const events=CSV_EVENT_COLUMNS.filter(([column])=>csvIsYes(get(column))).map(([column])=>column);
+    if(!events.length) errors.push(`Row ${rowNumber}: ${guestName} is not invited to any event.`);
+    if(household.guests.has(guestName.toLowerCase())) errors.push(`Row ${rowNumber}: ${guestName} appears more than once in household ${householdId}.`);
+    else household.guests.set(guestName.toLowerCase(),{name:guestName,events});
+  });
+  return {
+    households:[...households.values()].map(household=>({
+      householdId:household.householdId, householdName:household.householdName,
+      emails:[...household.emails].sort(), guests:[...household.guests.values()]
+    })),
+    errors
+  };
+}
+
+function renderGuestImport(result){
+  pendingGuestImport=result.errors.length ? [] : result.households;
+  const preview=$('guestImportPreview'); preview.classList.add('active');
+  const inviteCount=result.households.reduce((total,household)=>total+household.emails.length,0);
+  const guestCount=result.households.reduce((total,household)=>total+household.guests.length,0);
+  $('guestImportSummary').textContent=`${result.households.length} households · ${guestCount} named guests · ${inviteCount} authorized emails`;
+  $('guestImportRows').innerHTML=result.households.map(household=>{
+    const invitations=CSV_EVENT_COLUMNS.map(([key,label])=>`${label}: ${household.guests.filter(guest=>guest.events.includes(key)).length}`).join(' · ');
+    return `<tr><td>${adminEscape(household.householdName)}<br><small>${adminEscape(household.householdId)}</small></td><td>${household.emails.map(adminEscape).join('<br>')}</td><td>${household.guests.map(guest=>adminEscape(guest.name)).join('<br>')}</td><td>${adminEscape(invitations)}</td></tr>`;
+  }).join('');
+  $('guestImportErrors').innerHTML=result.errors.map(error=>`<li>${adminEscape(error)}</li>`).join('');
+  $('uploadGuestCsv').disabled=Boolean(result.errors.length || !result.households.length);
+  setImportMessage(result.errors.length ? `Please correct ${result.errors.length} issue${result.errors.length===1?'':'s'} before uploading.` : 'CSV validated. Review the preview before uploading.',Boolean(result.errors.length));
+}
+
+$('downloadGuestTemplate').addEventListener('click',downloadGuestTemplate);
+$('guestCsvFile').addEventListener('change',async event=>{
+  pendingGuestImport=[]; $('uploadGuestCsv').disabled=true; setImportMessage('');
+  const file=event.target.files[0]; if(!file) return;
+  if(file.size>2*1024*1024){ setImportMessage('Please choose a CSV smaller than 2 MB.',true); return; }
+  try{ renderGuestImport(buildGuestImport(await file.text())); }
+  catch(error){ $('guestImportPreview').classList.remove('active'); setImportMessage(error.message,true); }
+});
+
+$('uploadGuestCsv').addEventListener('click',async()=>{
+  if(!auth.currentUser || auth.currentUser.uid!==ADMIN_UID){ setImportMessage('Please sign in to Couple\'s View again.',true); return; }
+  if(!pendingGuestImport.length) return;
+  const button=$('uploadGuestCsv'); button.disabled=true; setImportMessage('Uploading invitations…');
+  try{
+    const invitationDocs=pendingGuestImport.flatMap(household=>household.emails.map(email=>({email,household})));
+    for(let start=0;start<invitationDocs.length;start+=400){
+      const batch=writeBatch(db);
+      invitationDocs.slice(start,start+400).forEach(({email,household})=>{
+        batch.set(doc(db,'invites',email),{
+          householdId:household.householdId, householdName:household.householdName,
+          guests:household.guests, updatedAt:serverTimestamp(), updatedBy:auth.currentUser.email || ''
+        },{merge:true});
+      });
+      await batch.commit();
+    }
+    setImportMessage(`${invitationDocs.length} invitation records uploaded successfully.`);
+  } catch(error){
+    console.error(error); setImportMessage('The upload was blocked. Confirm that your Firestore rules allow the Couple\'s View UID to write to invites.',true);
+  } finally { button.disabled=!pendingGuestImport.length; }
 });
 
 window.firebaseWedding = {
