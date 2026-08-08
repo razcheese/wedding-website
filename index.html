@@ -595,10 +595,11 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     .nav .nav-mono{display:none;}
     .nav button{width:100%; min-width:0; padding:5px 0; white-space:nowrap;}
     .nav .language-toggle{
-      position:fixed; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:240;
-      width:auto; min-width:46px; padding:9px 11px !important;
+      position:absolute; right:10px; top:100%; z-index:240;
+      width:auto; min-width:46px; padding:8px 11px !important;
       background:rgba(223,216,195,0.96) !important;
-      box-shadow:0 5px 18px rgba(43,52,16,0.2);
+      border-top:0 !important; border-radius:0 0 12px 12px;
+      box-shadow:0 5px 14px rgba(43,52,16,0.16);
     }
 
     .page{padding-top:calc(76px + env(safe-area-inset-top)); overflow-wrap:break-word;}
