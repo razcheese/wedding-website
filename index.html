@@ -324,14 +324,14 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     .things-carousel-count{font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap;}
     .things-carousel-window{overflow:hidden;}
     .things-carousel-track{display:flex; transition:transform .38s ease; touch-action:pan-y;}
-    .things-carousel-slide{flex:0 0 100%; min-width:0; text-align:center; padding:0 2px;}
-    .things-carousel-image-wrap{position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; margin-bottom:12px; background:var(--cream);}
-    .things-carousel-image{width:100%; height:100%; display:block; object-fit:cover;}
-    .things-photo-credit{position:absolute; right:7px; bottom:6px; padding:2px 5px; background:rgba(255,255,255,.78); color:var(--ink-soft); font-size:0.52rem; letter-spacing:.04em;}
-    .things-photo-credit:hover{color:var(--maroon);}
+    .things-carousel-slide{
+      flex:0 0 100%; min-width:0; min-height:165px; padding:22px 20px;
+      border:1px solid var(--gold); background:rgba(202,199,177,.16); text-align:center;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
     .things-carousel-slide h4{font-family:'Cormorant'; font-weight:500; letter-spacing:.06em; text-transform:uppercase; font-size:1.05rem; color:var(--gold); line-height:1.2; margin:0 0 7px;}
     .things-carousel-slide p{font-family:'Cormorant'; font-style:italic; font-size:.9rem; line-height:1.4; color:var(--ink-soft); margin:0 auto; max-width:330px;}
-    .things-carousel-slide h4 a{color:inherit;}
+    .things-carousel-map-link{margin-top:14px; font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--maroon); text-underline-offset:3px;}
     .things-carousel-controls{display:grid; grid-template-columns:38px 1fr 38px; align-items:center; gap:10px; margin-top:10px;}
     .things-carousel-arrow{width:38px; height:34px; border:1px solid var(--gold); background:transparent; color:var(--maroon); font-family:'Cormorant'; font-size:1.35rem; line-height:1; cursor:pointer;}
     .things-carousel-arrow:disabled{opacity:.35; cursor:default;}
@@ -592,6 +592,11 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
 
     .page{padding-top:calc(76px + env(safe-area-inset-top)); overflow-wrap:break-word;}
     #page-home.active{padding-top:calc(76px + env(safe-area-inset-top));}
+    #page-home .home-bg{
+      background-size:contain; background-position:center center; background-repeat:no-repeat;
+      background-color:var(--maroon-deep);
+    }
+    #page-registry .rh-photo{background-position:44% center;}
 
     #page-travel.active,
     #page-registry.active,
@@ -789,19 +794,19 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     <h2>Things To Do</h2>
   </div>
   <div class="things-list">
-    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/7/7d/Garden_pool_in_Filoli%2C_Woodside%2C_California.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Garden_pool_in_Filoli,_Woodside,_California.jpg" data-photo-credit="Wikimedia Commons">
+    <div class="thing-row">
                   <h4><a href="https://www.google.com/maps/search/?api=1&amp;query=Filoli%2C+86+Ca%C3%B1ada+Road%2C+Woodside%2C+CA+94062" target="_blank" rel="noopener">Filoli Historic House &amp; Garden</a></h4>
       <p>A grand estate in nearby Woodside, with sixteen acres of formal gardens — lovely in early June. Tickets required.</p>
     </div>
-    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Stanford_University_Main_Quad_-_7_June_2009.jpg/960px-Stanford_University_Main_Quad_-_7_June_2009.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Stanford_University_Main_Quad_-_7_June_2009.jpg" data-photo-credit="Wikimedia Commons">
+    <div class="thing-row">
             <h4><a href="https://www.google.com/maps/place/The+Stanford+Oval/@37.4319968,-122.1711782,17z/data=!4m15!1m8!3m7!1s0x808fbb2c770584ef:0x598e38cb7c2bf4c9!2sRodin+Sculpture+Garden!8m2!3d37.4322972!4d-122.1708556!10e5!16s%2Fg%2F1tdhf75b!3m5!1s0x808fbb2a2cbff0a9:0x98ffff0995e539ff!8m2!3d37.4301554!4d-122.1693704!16s%2Fg%2F11csq61cjz?entry=ttu&g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Stanford University</a></h4>
       <p>Wander the sandstone quad, then see the famed Rodin sculptures. </p>
     </div>
-    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/7/75/Allied_Arts_Guild_courtyard.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Allied_Arts_Guild_courtyard.jpg" data-photo-credit="Wikimedia Commons">
+    <div class="thing-row">
       <h4><a href="https://www.google.com/maps/place/Allied+Arts+Guild/@37.4414075,-122.1814685,17z/data=!3m1!4b1!4m6!3m5!1s0x808fa4cbb61e7ccf:0x6494155886b16c72!8m2!3d37.4414033!4d-122.1788936!16zL20vMDh2NXIw?entry=ttu&amp;g_ep=EgoyMDI2MDgwMy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">Allied Arts Guild</a></h4>
       <p>Our venue is also home to artisan shops and courtyard gardens worth a stroll.</p>
     </div>
-    <div class="thing-row" data-highlight-image="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Redwood_Grove_Nature_Preserve%2C_Los_Altos%2C_California_13_2018-06-08.jpg/960px-Redwood_Grove_Nature_Preserve%2C_Los_Altos%2C_California_13_2018-06-08.jpg" data-photo-source="https://commons.wikimedia.org/wiki/File:Redwood_Grove_Nature_Preserve,_Los_Altos,_California_13_2018-06-08.jpg" data-photo-credit="Wikimedia Commons">
+    <div class="thing-row">
             <h4><a href="https://www.google.com/maps/search/?api=1&amp;query=Redwood+Grove+Nature+Preserve%2C+482+University+Avenue%2C+Los+Altos%2C+CA+94022" target="_blank" rel="noopener">Los Altos Redwood Grove Nature Preserve</a></h4>
       <p>Stroll through our Thuy's favorite local place and enjoy the shade of the beautiful redwood trees.</p>
     </div>
@@ -1100,11 +1105,11 @@ const thingsMobileCarousels = document.getElementById('thingsMobileCarousels');
 if(thingsMobileCarousels){
   const allThingRows = Array.from(document.querySelectorAll('#page-things .things-list .thing-row'));
   const carouselGroups = [
-    { title:'Places to Explore', rows:allThingRows.slice(0,4), showImages:true },
-    { title:'Our Favorite Eateries', rows:allThingRows.slice(4), showImages:false }
+    { title:'Places to Explore', rows:allThingRows.slice(0,4) },
+    { title:'Our Favorite Eateries', rows:allThingRows.slice(4) }
   ];
 
-  carouselGroups.forEach((group, groupIndex) => {
+  carouselGroups.forEach(group => {
     const section = document.createElement('section');
     section.className = 'things-carousel';
     section.setAttribute('aria-label', group.title);
@@ -1125,33 +1130,24 @@ if(thingsMobileCarousels){
     group.rows.forEach(row => {
       const slide = document.createElement('article');
       slide.className = 'things-carousel-slide';
-
-      if(group.showImages && row.dataset.highlightImage){
-        const figure = document.createElement('figure');
-        figure.className = 'things-carousel-image-wrap';
-        const image = document.createElement('img');
-        image.className = 'things-carousel-image';
-        image.src = row.dataset.highlightImage;
-        image.alt = `${row.querySelector('h4').textContent.trim()} highlight`;
-        image.loading = groupIndex === 0 && track.children.length === 0 ? 'eager' : 'lazy';
-        figure.appendChild(image);
-
-        if(row.dataset.photoSource){
-          const credit = document.createElement('a');
-          credit.className = 'things-photo-credit';
-          credit.href = row.dataset.photoSource;
-          credit.target = '_blank';
-          credit.rel = 'noopener';
-          credit.textContent = `Photo: ${row.dataset.photoCredit || 'source'}`;
-          figure.appendChild(credit);
-        }
-        slide.appendChild(figure);
-      }
-
       const rowHeading = row.querySelector('h4');
       const rowDescription = row.querySelector('p');
-      if(rowHeading) slide.appendChild(rowHeading.cloneNode(true));
+      const rowMapLink = rowHeading ? rowHeading.querySelector('a') : null;
+      if(rowHeading){
+        const mobileHeading = document.createElement('h4');
+        mobileHeading.textContent = rowHeading.textContent.trim();
+        slide.appendChild(mobileHeading);
+      }
       if(rowDescription) slide.appendChild(rowDescription.cloneNode(true));
+      if(rowMapLink){
+        const mobileMapLink = document.createElement('a');
+        mobileMapLink.className = 'things-carousel-map-link';
+        mobileMapLink.href = rowMapLink.href;
+        mobileMapLink.target = '_blank';
+        mobileMapLink.rel = 'noopener';
+        mobileMapLink.textContent = 'View on Maps';
+        slide.appendChild(mobileMapLink);
+      }
       track.appendChild(slide);
     });
 
