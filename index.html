@@ -129,6 +129,11 @@
     font-size:0.7rem; letter-spacing:0.18em; text-transform:uppercase;
     flex-wrap:wrap;
   }
+  .language-toggle{
+    min-width:42px; padding:6px 9px !important; border:1px solid var(--gold) !important;
+    border-radius:999px; color:var(--wisteria-deep) !important; background:rgba(255,255,255,0.26) !important;
+    font-weight:500; letter-spacing:0.1em !important;
+  }
   .nav button{
     background:none; border:none; cursor:pointer; color:var(--ink-soft);
     padding:4px 2px; position:relative; font-size:inherit; letter-spacing:inherit; text-transform:inherit;
@@ -317,7 +322,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   @media (max-width:760px){
     #page-things.active{overflow:auto;}
     .things-list{display:none;}
-    .things-mobile-carousels{display:block; flex:1 1 auto; width:100%; padding:10px 20px 22px; overflow:hidden;}
+    .things-mobile-carousels{display:block; flex:0 0 auto; width:100%; padding:10px 20px 38px; overflow:visible;}
     .things-carousel + .things-carousel{margin-top:26px;}
     .things-carousel-heading{display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:9px;}
     .things-carousel-heading h3{font-family:'Cormorant'; font-style:italic; font-weight:500; font-size:1.18rem; color:var(--maroon); margin:0;}
@@ -589,6 +594,12 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
     }
     .nav .nav-mono{display:none;}
     .nav button{width:100%; min-width:0; padding:5px 0; white-space:nowrap;}
+    .nav .language-toggle{
+      position:fixed; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); z-index:240;
+      width:auto; min-width:46px; padding:9px 11px !important;
+      background:rgba(223,216,195,0.96) !important;
+      box-shadow:0 5px 18px rgba(43,52,16,0.2);
+    }
 
     .page{padding-top:calc(76px + env(safe-area-inset-top)); overflow-wrap:break-word;}
     #page-home.active{padding-top:calc(76px + env(safe-area-inset-top));}
@@ -650,6 +661,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   <button data-page="gallery">Gallery</button>
   <button data-page="registry">Registry</button>
   <button data-page="rsvp">RSVP</button>
+  <button type="button" class="language-toggle" id="languageToggle" aria-label="Xem trang bằng tiếng Việt">VI</button>
 </nav>
 
 <!-- ============ HOME ============ -->
@@ -1207,6 +1219,152 @@ if(thingsMobileCarousels){
     updateThingsCarousel();
   });
 }
+
+/* ================= English / Vietnamese language switch ================= */
+const VI_TRANSLATIONS = Object.freeze({
+  'Home':'Trang Chủ','The Weekend':'Cuối Tuần','Travel':'Đi Lại','Things To Do':'Khám Phá',
+  'FAQ':'Hỏi Đáp','Gallery':'Hình Ảnh','Registry':'Quà Cưới','RSVP':'Phúc Đáp',
+  'Thuy and Kevin':'Thuy và Kevin','June 5, 2027':'Ngày 5 tháng 6, 2027',
+  'June 4 – 5, 2027':'Ngày 4 – 5 tháng 6, 2027','the weekend':'cuối tuần','June 4, 2027':'Ngày 4 tháng 6, 2027',
+  'Welcome Dinner & Rehearsal':'Tiệc Chào Mừng & Tổng Duyệt','7:00 PM to 9:00 PM':'7:00 tối đến 9:00 tối',
+  'Semi-formal attire':'Trang phục bán trang trọng','+ Add to Calendar':'+ Thêm vào lịch','Photo':'Hình ảnh',
+  'The Ceremony and Reception':'Lễ Thành Hôn và Tiệc Cưới','4:00 PM to 9:00 PM':'4:00 chiều đến 9:00 tối',
+  'Dinner, dancing, and an open bar':'Tiệc tối, khiêu vũ và quầy bar mở','Cocktail attire':'Trang phục cocktail',
+  'The After Party':'Tiệc Sau Lễ','9:00 PM to midnight':'9:00 tối đến nửa đêm','Late night bites and drinks':'Đồ ăn nhẹ và thức uống khuya',
+  "Couple's View":'Dành Cho Cô Dâu Chú Rể',
+  'Getting Here':'Hướng Dẫn Di Chuyển','Travel & Stay':'Đi Lại & Lưu Trú','Flying in to':'Bay đến',
+  'San Francisco Intl. (SFO) or San Jose (SJC)':'Sân bay San Francisco (SFO) hoặc San Jose (SJC)',
+  '~35 min by car':'Khoảng 35 phút đi xe','Rental car or rideshare':'Thuê xe hoặc gọi xe công nghệ',
+  'Stay Nearby ($)':'Lưu Trú Gần Đây ($)','Stay Nearby ($$)':'Lưu Trú Gần Đây ($$)','Stay Nearby ($$$)':'Lưu Trú Gần Đây ($$$)',
+  '5 min by car to the venue':'5 phút đi xe đến địa điểm cưới','5 min walk from the after party':'5 phút đi bộ từ tiệc sau lễ',
+  'Block held through May 8th':'Phòng được giữ đến ngày 8 tháng 5','Code: THUYANDKEVIN':'Mã: THUYANDKEVIN','Book a Room':'Đặt Phòng',
+  'Downtown Palo Alto':'Trung Tâm Palo Alto','Consider one of the plentiful hotels or Airbnbs near downtown Palo Alto':'Quý khách có thể chọn một trong nhiều khách sạn hoặc Airbnb gần trung tâm Palo Alto',
+  '10 min from the venue':'10 phút từ địa điểm cưới','Parking & Transportation':'Đậu Xe & Di Chuyển','Getting To The Venue':'Đến Địa Điểm Cưới',
+  'Free on-site and neighborhood parking':'Có chỗ đậu xe miễn phí tại địa điểm và trong khu phố',
+  'Transportation to the After Party departs at 9 PM':'Xe đưa đến tiệc sau lễ sẽ khởi hành lúc 9:00 tối',
+  'Cars left on site after the event will need to be collected Monday morning.':'Xe để lại tại địa điểm sau sự kiện chỉ có thể được nhận lại vào sáng thứ Hai.',
+  "While You're In Town":'Trong Thời Gian Quý Khách Ở Đây','Places to Explore':'Những Nơi Nên Khám Phá','Our Favorite Eateries':'Những Quán Ăn Yêu Thích',
+  'A grand estate in nearby Woodside, with sixteen acres of formal gardens — lovely in early June. Tickets required.':'Một dinh thự trang nhã gần Woodside, với mười sáu mẫu vườn cảnh tuyệt đẹp vào đầu tháng Sáu. Cần mua vé trước.',
+  'Wander the sandstone quad, then see the famed Rodin sculptures.':'Dạo quanh khuôn viên sa thạch và chiêm ngưỡng những tác phẩm điêu khắc Rodin nổi tiếng.',
+  'Our venue is also home to artisan shops and courtyard gardens worth a stroll.':'Địa điểm cưới của chúng tôi còn có các cửa hàng thủ công và những khu vườn sân trong rất đáng dạo thăm.',
+  "Stroll through our Thuy's favorite local place and enjoy the shade of the beautiful redwood trees.":'Dạo bước dưới những tán hồng sam tại một trong những địa điểm địa phương Thuy yêu thích nhất.',
+  'Creative, seasonal ice cream flavors in downtown Palo Alto.':'Những vị kem sáng tạo theo mùa tại trung tâm Palo Alto.',
+  'Flavorful Pakistani and Indian favorites in a lively neighborhood spot.':'Các món Pakistan và Ấn Độ đậm đà trong một không gian khu phố nhộn nhịp.',
+  'A historic beer garden for burgers, drinks, and relaxed outdoor dining.':'Vườn bia lâu đời với burger, thức uống và không gian ngoài trời thư thái.',
+  'Fragrant jasmine milk teas and beautifully crafted tea drinks.':'Trà sữa hoa nhài thơm dịu và những thức uống từ trà được pha chế tinh tế.',
+  'View on Maps':'Xem trên bản đồ','Previous':'Trước','Next':'Tiếp',
+  'A Few Helpful Details':'Một Vài Thông Tin Hữu Ích','Frequently Asked Questions':'Các Câu Hỏi Thường Gặp',
+  'What is the dress code?':'Trang phục dự tiệc như thế nào?',
+  'Our wedding will be cocktail attire. For a June evening in Menlo Park, we suggest mid-length or longer dresses, elegant separates, sport coats with trousers, or suits.':'Trang phục của tiệc cưới là cocktail. Cho một buổi tối tháng Sáu tại Menlo Park, chúng tôi gợi ý đầm dài từ ngang bắp chân trở xuống, trang phục rời thanh lịch, áo blazer với quần âu hoặc bộ suit.',
+  'Will the celebration be indoors or outdoors?':'Buổi lễ sẽ diễn ra trong nhà hay ngoài trời?','Both the ceremony and reception will take place outdoors.':'Lễ thành hôn và tiệc cưới đều sẽ diễn ra ngoài trời.',
+  'When should I arrive for the ceremony?':'Tôi nên đến dự lễ lúc mấy giờ?','Please arrive between 4:00 and 4:15 p.m. The ceremony will begin promptly at 4:30 p.m. To preserve the moment, late arrivals will be asked to wait until the ceremony has concluded.':'Xin vui lòng đến trong khoảng 4:00–4:15 chiều. Buổi lễ sẽ bắt đầu đúng 4:30 chiều. Để giữ trọn vẹn khoảnh khắc, khách đến muộn vui lòng đợi đến khi buổi lễ kết thúc.',
+  'What is the weather typically like?':'Thời tiết thường như thế nào?','June in Menlo Park is typically sunny, with temperatures in the 70s. Our ceremony and reception are planned outdoors, weather permitting, and umbrellas will provide shade during the reception. We recommend bringing a light layer for the evening.':'Tháng Sáu tại Menlo Park thường có nắng, nhiệt độ khoảng 21–26°C. Lễ thành hôn và tiệc cưới dự kiến diễn ra ngoài trời nếu thời tiết cho phép; ô che nắng sẽ được bố trí tại tiệc cưới. Chúng tôi khuyên quý khách mang theo một lớp áo mỏng cho buổi tối.',
+  'How should I get to the venue?':'Tôi nên đến địa điểm cưới bằng cách nào?','Complimentary parking is available at the venue, with ample free street parking nearby. Please note that the venue will close when our celebration ends and will not reopen until Monday morning; any car left at the venue cannot be retrieved before then. If you plan to join us for the after-party, we recommend arriving by Uber or Lyft. Transportation to the after-party will depart from the venue at 9:00 p.m.':'Có chỗ đậu xe miễn phí tại địa điểm và nhiều chỗ đậu xe miễn phí trên đường phố gần đó. Xin lưu ý địa điểm sẽ đóng cửa khi buổi tiệc kết thúc và chỉ mở lại vào sáng thứ Hai; xe để lại tại đây sẽ không thể lấy trước thời điểm đó. Nếu dự định tham gia tiệc sau lễ, quý khách nên đến bằng Uber hoặc Lyft. Xe đưa đón đến tiệc sau lễ sẽ khởi hành lúc 9:00 tối.',
+  'May I take photos with my phone?':'Tôi có thể chụp ảnh bằng điện thoại không?','We will be having an unplugged ceremony. Please silence your phone and refrain from taking photos during the ceremony. We look forward to seeing your photos throughout the rest of the celebration.':'Buổi lễ thành hôn sẽ không sử dụng điện thoại. Xin vui lòng để điện thoại ở chế độ im lặng và không chụp ảnh trong suốt buổi lễ. Chúng tôi rất mong được xem những hình ảnh quý khách ghi lại trong phần còn lại của ngày vui.',
+  'Will there be a hotel block?':'Sẽ có phòng khách sạn dành riêng cho khách mời không?','Yes. Please visit the':'Có. Xin vui lòng xem trang','page for our room block and additional nearby accommodations.':'để biết thông tin về phòng được giữ trước và các lựa chọn lưu trú gần đó.',
+  'May I bring a guest? Are children invited?':'Tôi có thể đưa thêm khách hoặc trẻ em đi cùng không?','As our celebration is limited in size, we are able to accommodate only the guests and children named on each invitation. Thank you for your understanding.':'Vì quy mô buổi tiệc có giới hạn, chúng tôi chỉ có thể đón tiếp những vị khách và trẻ em có tên trên từng thiệp mời. Chân thành cảm ơn sự thông cảm của quý vị.',
+  'A Few Favorites':'Một Vài Khoảnh Khắc Yêu Thích','Previous photo':'Ảnh trước','Next photo':'Ảnh tiếp theo',
+  'The proposal — Big Sur, October 2024':'Lời cầu hôn — Big Sur, tháng 10 năm 2024','Engagement shoot at Filoli Gardens':'Bộ ảnh đính hôn tại vườn Filoli',
+  'First trip together — Lake Tahoe, 2021':'Chuyến đi đầu tiên cùng nhau — Lake Tahoe, 2021','Sunday farmers market, our favorite ritual':'Chợ nông sản Chủ Nhật, thói quen yêu thích của chúng tôi',
+  'Celebrating with family, Thanksgiving 2023':'Quây quần cùng gia đình, Lễ Tạ Ơn 2023','Venue walkthrough at Allied Arts Guild':'Thăm địa điểm cưới tại Allied Arts Guild',
+  'Thank you from the bottom of our hearts for sharing in our special day':'Chân thành cảm ơn quý vị đã cùng chúng tôi sẻ chia ngày vui đặc biệt này',
+  'Your presence at our celebration is the greatest gift. For those who have asked, we’ve created a newlywed fund to help us begin this next chapter together.':'Sự hiện diện của quý vị trong ngày vui là món quà quý giá nhất. Theo lời hỏi thăm của nhiều người, chúng tôi đã lập quỹ tân hôn để cùng nhau bắt đầu chương mới.',
+  'Home Fund':'Quỹ Tổ Ấm','Help us move out of our studio apartment! Please!':'Hãy giúp chúng tôi chuyển khỏi căn hộ studio nhé!',
+  'Contribute via Venmo':'Gửi quà qua Venmo','Honeymoon Fund':'Quỹ Tuần Trăng Mật','Help send us to Tahiti for a week we\'ll never forget.':'Góp phần giúp chúng tôi có một tuần trăng mật đáng nhớ tại Tahiti.',
+  "We Can't Wait To Celebrate":'Mong Chờ Được Chung Vui','Reply Now':'Phúc Đáp','Access Your Invitation':'Mở Thiệp Mời Của Quý Khách',
+  'Enter an email address associated with your invitation. We’ll send you a private link to view or update your household’s RSVP.':'Vui lòng nhập địa chỉ email có tên trong thiệp mời. Chúng tôi sẽ gửi một liên kết riêng để quý khách xem hoặc cập nhật phúc đáp của gia đình.',
+  'Invited email address':'Email trong thiệp mời','Send Link':'Gửi Liên Kết','Sign Out':'Đăng Xuất',
+  'Please respond for each named guest and each event shown below.':'Vui lòng phúc đáp cho từng khách được nêu tên và từng sự kiện hiển thị bên dưới.',
+  'A note for the couple (optional)':'Lời nhắn dành cho cô dâu chú rể (không bắt buộc)','Song requests, well wishes, anything at all...':'Yêu cầu bài hát, lời chúc hoặc bất kỳ lời nhắn nào...',
+  'Send RSVP':'Gửi Phúc Đáp','Update RSVP':'Cập Nhật Phúc Đáp','Tea Ceremony':'Lễ Gia Tiên','Welcome Event':'Tiệc Chào Mừng','Ceremony & Reception':'Lễ Thành Hôn & Tiệc Cưới','After Party':'Tiệc Sau Lễ',
+  'Joyfully Accepts':'Hân Hạnh Tham Dự','Regretfully Declines':'Rất Tiếc Không Thể Tham Dự','Dietary Restrictions & Allergies (optional)':'Yêu Cầu Ăn Uống & Dị Ứng (không bắt buộc)',
+  'Please respond to each event shown for every guest.':'Vui lòng phúc đáp từng sự kiện được hiển thị cho mỗi khách.',
+  'Thank you — your RSVP has been received!':'Xin cảm ơn — chúng tôi đã nhận được phúc đáp!','Something went wrong — please try again.':'Đã xảy ra lỗi — vui lòng thử lại.',
+  'This email is not associated with an invitation. Please try the invited email address or contact the couple.':'Email này không có trong danh sách khách mời. Vui lòng thử email ghi trên thiệp hoặc liên hệ cô dâu chú rể.',
+  'We could not open your invitation. Please try again.':'Không thể mở thiệp mời. Vui lòng thử lại.','Your private sign-in link is on its way. Please check your email.':'Liên kết đăng nhập riêng đang được gửi. Vui lòng kiểm tra email.',
+  'We could not send the link. Please confirm the address and try again.':'Không thể gửi liên kết. Vui lòng kiểm tra email và thử lại.'
+});
+
+const languageToggle = document.getElementById('languageToggle');
+let currentLanguage = 'en';
+let isApplyingLanguage = false;
+
+function translateTextNode(node, language){
+  const parent = node.parentElement;
+  if(!parent || parent.closest('#languageToggle') || ['SCRIPT','STYLE','NOSCRIPT','SVG'].includes(parent.tagName)) return;
+  const raw = node.nodeValue;
+  if(!raw || !raw.trim()) return;
+  if(language === 'en'){
+    if(node.__weddingEnglish !== undefined && node.nodeValue !== node.__weddingEnglish) node.nodeValue = node.__weddingEnglish;
+    return;
+  }
+  let english = node.__weddingEnglish !== undefined ? node.__weddingEnglish : raw;
+  const oldKey = english.trim();
+  const oldTranslation = VI_TRANSLATIONS[oldKey];
+  const currentKey = raw.trim();
+  if(node.__weddingEnglish !== undefined && currentKey !== oldKey && currentKey !== oldTranslation) english = raw;
+  const key = english.trim();
+  const translated = VI_TRANSLATIONS[key];
+  if(!translated) return;
+  node.__weddingEnglish = english;
+  const next = english.replace(key, translated);
+  if(node.nodeValue !== next) node.nodeValue = next;
+}
+
+function translateAttributes(root, language){
+  const elements = [];
+  if(root.nodeType === Node.ELEMENT_NODE && root.matches('[placeholder],[aria-label]')) elements.push(root);
+  if(root.querySelectorAll) elements.push(...root.querySelectorAll('[placeholder],[aria-label]'));
+  elements.forEach(element => ['placeholder','aria-label'].forEach(attribute => {
+    if(!element.hasAttribute(attribute) || element.id === 'languageToggle') return;
+    const property = attribute === 'placeholder' ? 'weddingPlaceholderEnglish' : 'weddingAriaEnglish';
+    const current = element.getAttribute(attribute);
+    if(language === 'en'){
+      if(element.dataset[property]) element.setAttribute(attribute, element.dataset[property]);
+      return;
+    }
+    const english = element.dataset[property] || current;
+    const direct = VI_TRANSLATIONS[english];
+    const dietary = english.startsWith('Dietary needs for ') ? `Yêu cầu ăn uống cho ${english.slice(18)}` : null;
+    if(direct || dietary){ element.dataset[property] = english; element.setAttribute(attribute, direct || dietary); }
+  }));
+}
+
+function applyLanguage(language, root=document.body){
+  isApplyingLanguage = true;
+  try{
+    if(root.nodeType === Node.TEXT_NODE) translateTextNode(root, language);
+    else {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let node;
+      while((node = walker.nextNode())) translateTextNode(node, language);
+      translateAttributes(root, language);
+    }
+  } finally { isApplyingLanguage = false; }
+}
+
+function setLanguage(language){
+  currentLanguage = language === 'vi' ? 'vi' : 'en';
+  applyLanguage(currentLanguage);
+  document.documentElement.lang = currentLanguage;
+  languageToggle.textContent = currentLanguage === 'vi' ? 'EN' : 'VI';
+  languageToggle.setAttribute('aria-label', currentLanguage === 'vi' ? 'View website in English' : 'Xem trang bằng tiếng Việt');
+  languageToggle.setAttribute('aria-pressed', String(currentLanguage === 'vi'));
+  try{ localStorage.setItem('weddingLanguage', currentLanguage); }catch(error){}
+}
+
+languageToggle.addEventListener('click', () => setLanguage(currentLanguage === 'en' ? 'vi' : 'en'));
+const languageObserver = new MutationObserver(mutations => {
+  if(isApplyingLanguage || currentLanguage !== 'vi') return;
+  mutations.forEach(mutation => {
+    if(mutation.type === 'characterData') applyLanguage('vi', mutation.target);
+    mutation.addedNodes.forEach(node => applyLanguage('vi', node));
+  });
+});
+languageObserver.observe(document.body, {subtree:true, childList:true, characterData:true});
+let savedLanguage = 'en';
+try{ savedLanguage = localStorage.getItem('weddingLanguage') || 'en'; }catch(error){}
+setLanguage(savedLanguage);
 
 /* ================= gallery (horizontal, click-through) ================= */
 const gallerySlides = document.querySelectorAll('.gallery-slide');
