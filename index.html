@@ -661,7 +661,7 @@ body:not(.pre-auth) #nav{opacity:0;animation:navFade 1.2s ease 1.8s forwards;}
   <button data-page="gallery">Gallery</button>
   <button data-page="registry">Registry</button>
   <button data-page="rsvp">RSVP</button>
-  <button type="button" class="language-toggle" id="languageToggle" aria-label="Xem trang bằng tiếng Việt">VI</button>
+  <button type="button" class="language-toggle" id="languageToggle" aria-label="Xem trang bằng tiếng Việt">VN</button>
 </nav>
 
 <!-- ============ HOME ============ -->
@@ -1347,7 +1347,7 @@ function setLanguage(language){
   currentLanguage = language === 'vi' ? 'vi' : 'en';
   applyLanguage(currentLanguage);
   document.documentElement.lang = currentLanguage;
-  languageToggle.textContent = currentLanguage === 'vi' ? 'EN' : 'VI';
+  languageToggle.textContent = currentLanguage === 'vi' ? 'EN' : 'VN';
   languageToggle.setAttribute('aria-label', currentLanguage === 'vi' ? 'View website in English' : 'Xem trang bằng tiếng Việt');
   languageToggle.setAttribute('aria-pressed', String(currentLanguage === 'vi'));
   try{ localStorage.setItem('weddingLanguage', currentLanguage); }catch(error){}
